@@ -1,13 +1,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: puppeteer-3
+  name: puppeteer-1
   namespace: webscraping
-  labels:
-    kueue.x-k8s.io/queue-name: webscraping-queue
 spec:
   ttlSecondsAfterFinished: 20
-  suspend: true
   template:
     spec:
       initContainers:
@@ -15,10 +12,6 @@ spec:
         image: busybox
         command: ["/bin/sh"]
         args: ["-c", "chmod -R 777 /home/pptruser/scripts"]
-        resources:
-          requests:
-            cpu: 100m
-            memory: "100Mi"
         volumeMounts:
         - name: "scripts-dir"
           mountPath: "/home/pptruser/scripts"
@@ -27,18 +20,16 @@ spec:
         image: ntartaglia2271/puppeteer:3.0
         imagePullPolicy: Always
         command: ["node"]
-        args: ["/home/pptruser/scripts/poc-carrefour.js"]
-        resources:
-          requests:
-            cpu: 1
-            memory: "1Gi"
+        args: ["/home/pptruser/scripts/poc-carrefour-onepod-neu.js"]
         env:
+        - name: JOB
+          value: "1"
         - name: DISTRIBUTEUR
           value: "Carrefour"
         - name: URL
           value: "https://www.carrefour.fr"
         - name: SEARCH
-          value: "3560070897698"
+          value: "3017233001008"
         - name: MONGO_PASSWORD
           valueFrom:
             secretKeyRef:

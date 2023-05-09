@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const mongoose = require('mongoose');
 
 const url = process.env.URL;
+const job = process.env.JOB;
 const mySearch = process.env.SEARCH;
 const distributeur = process.env.DISTRIBUTEUR;
 const mongodbServer = process.env.MONGODB_SERVICE_SERVICE_HOST;
@@ -28,6 +29,7 @@ function getRandomInt(min, max) {
     
     await mongoose.connect('mongodb://' + user + ':' + password + '@' + mongodbServer + ':' + mongodbPort + '/webscraping');
     const distributeurSchema = new mongoose.Schema({
+        job: String,
         distributeur: String,
         codeBarre: String,
         price: String
@@ -60,8 +62,8 @@ function getRandomInt(min, max) {
     console.log('Chargement de la page web Auchan');
     await page.goto(url, { waitUntil: ['networkidle2'] });
     await page.setGeolocation({
-        latitude: 48.714509,
-        longitude: 2.245748
+        latitude: 50.4167,
+        longitude: 2.9833
     });
 
     const granted = await page.evaluate(async () => {
@@ -97,7 +99,7 @@ function getRandomInt(min, max) {
     await page.waitForNavigation({ waitUntil: ['networkidle2'] });
 
     if (await page.$('span.no-result__category') !== null) {
-        const produit = new Produit({ distributeur: distributeur, codeBarre: mySearch, price: "pas trouvé" });
+        const produit = new Produit({ job: job, distributeur: distributeur, codeBarre: mySearch, price: "pas trouvé" });
         await produit.save(); 
     }else{
         console.log("Récupération de tous les liens web des produits recherchés");
@@ -115,10 +117,10 @@ function getRandomInt(min, max) {
                 await page.goto(link, { waitUntil: ['networkidle2'] });
         
                 console.log("Temporisation aléatoire entre 8 et 12 secondes");
-                await page.waitForTimeout(getRandomInt(8000,12000));
+                await page.waitForTimeout(getRandomInt(6000,8000));
                 const blockPrice = await page.waitForSelector('.product-price.product-price--small.text-color');
                 const price = await page.evaluate(el => el.innerText, blockPrice);
-                const produit = new Produit({ distributeur: distributeur, codeBarre: mySearch, price: price });
+                const produit = new Produit({ job: job, distributeur: distributeur, codeBarre: mySearch, price: price });
                 await produit.save();
                 console.log('Prix ajouté en BD');
             }

@@ -33,6 +33,8 @@ spec:
             cpu: 1
             memory: "1Gi"
         env:
+        - name: JOB
+          value: "33"
         - name: DISTRIBUTEUR
           value: "Auchan"
         - name: URL

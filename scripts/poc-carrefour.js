@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const mongoose = require('mongoose');
 
 const url = process.env.URL;
+const job = process.env.JOB;
 const mySearch = process.env.SEARCH;
 const distributeur = process.env.DISTRIBUTEUR;
 const mongodbServer = process.env.MONGODB_SERVICE_SERVICE_HOST;
@@ -28,6 +29,7 @@ function getRandomInt(min, max) {
 
     await mongoose.connect('mongodb://' + user + ':' + password + '@' + mongodbServer + ':' + mongodbPort + '/webscraping');
     const distributeurSchema = new mongoose.Schema({
+        job: String,
         distributeur: String,
         codeBarre: String,
         price: String
@@ -56,13 +58,14 @@ function getRandomInt(min, max) {
     await page.setViewport({ width: 1440, height: 1024 });
 
     console.log('Chargement de la page web Carrefour');
-    await page.goto(url, { waitUntil: ['networkidle2'] });
-
-    console.log("Clic sur la popup d'acceptation des cookies");
+    
     const buttonAcceptCookies = '#onetrust-accept-btn-handler';
-    await page.waitForSelector(buttonAcceptCookies);
+    await page.goto(url, { waitUntil: ['networkidle0'] });
+   
+    await page.waitForSelector(buttonAcceptCookies, { visible: true });
+    console.log("Clic sur la popup d'acceptation des cookies");
     await page.click(buttonAcceptCookies);
-
+    
     console.log("Recherche des produits correspondant à '" + mySearch + "'");
     const searchInput = await page.$('[name="q"]');
     await searchInput.type(mySearch);
@@ -70,7 +73,7 @@ function getRandomInt(min, max) {
     await page.waitForNavigation({ waitUntil: ['networkidle2'] });
 
     if (await page.$('div.search-no-result__content') !== null) {
-        const produit = new Produit({ distributeur: distributeur, codeBarre: mySearch, price: "pas trouvé" });
+        const produit = new Produit({ job: job, distributeur: distributeur, codeBarre: mySearch, price: "pas trouvé" });
         await produit.save();
     } else {
         console.log("Récupération de tous les liens web des produits recherchés");
@@ -96,7 +99,7 @@ function getRandomInt(min, max) {
                 const blockPrice = await page.waitForSelector('div.pdp-pricing__block-left > div:nth-child(2)');
                 // await completeBlockIngredients.click();
                 const price = await page.evaluate(el => el.innerText, blockPrice);
-                const produit = new Produit({ distributeur: distributeur, codeBarre: mySearch, price: price });
+                const produit = new Produit({ job: job, distributeur: distributeur, codeBarre: mySearch, price: price });
                 await produit.save();
                 console.log('Prix ajouté en BD');
             }

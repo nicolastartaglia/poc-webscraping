@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: puppeteer-15
+  name: puppeteer-$COUNT
   namespace: webscraping
   labels:
     kueue.x-k8s.io/queue-name: webscraping-queue
@@ -27,18 +27,20 @@ spec:
         image: ntartaglia2271/puppeteer:3.0
         imagePullPolicy: Always
         command: ["node"]
-        args: ["/home/pptruser/scripts/poc-carrefour.js"]
+        args: ["/home/pptruser/scripts/poc-leclerc.js"]
         resources:
           requests:
             cpu: 1
             memory: "1Gi"
         env:
+        - name: JOB
+          value: $JOB
         - name: DISTRIBUTEUR
-          value: "Carrefour"
+          value: $DISTRIBUTEUR
         - name: URL
-          value: "https://www.carrefour.fr"
+          value: $URL
         - name: SEARCH
-          value: "3560070957033"
+          value: $SEARCH
         - name: MONGO_PASSWORD
           valueFrom:
             secretKeyRef:
