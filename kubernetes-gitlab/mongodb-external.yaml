@@ -1,0 +1,15 @@
+apiVersion: mongodb.com/v1
+kind: MongoDB
+metadata:
+  name: mongo-external
+  namespace: webscraping-lg-1
+spec:
+  version: "4.2.2-ent"
+  opsManager:
+    configMapRef:
+      name: mongo-configmap
+  credentials: mongodb-secret
+  type: Standalone
+  persistent: true
+  exposedExternally: true
+

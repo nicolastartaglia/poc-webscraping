@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-configmap
+  namespace: webscraping-lg-1
+data:
+  database_url: mongodb-service
