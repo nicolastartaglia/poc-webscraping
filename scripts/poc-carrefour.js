@@ -96,7 +96,8 @@ function getRandomInt(min, max) {
                 await page.waitForTimeout(getRandomInt(8000, 12000));
                 // const product = await page.waitForSelector(selectorIngredients);
                 // if (product != null) await product.click();
-                const blockPrice = await page.waitForSelector('div.pdp-pricing__block-left > div:nth-child(2)');
+                //const blockPrice = await page.waitForSelector('div.pdp-pricing__block-left > div:nth-child(2)');
+                const blockPrice = await page.waitForSelector("div[class='pdp-pricing__block-left'] p[class='pl-text pl-text--size-s pl-text--style-p']");
                 // await completeBlockIngredients.click();
                 const price = await page.evaluate(el => el.innerText, blockPrice);
                 const produit = new Produit({ job: job, distributeur: distributeur, codeBarre: mySearch, price: price });

@@ -1,8 +1,14 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: webscrap
+#networking:
+  # the default CNI will not be installed
+  #disableDefaultCNI: true
 nodes:
 - role: control-plane
+  #extraMounts:
+  #- hostPath: /c/webscraping/poc/poc-webscraping/plugins/bin
+  #  containerPath: /opt/cni/bin
 - role: worker
   extraPortMappings:
     - containerPort: 27017
